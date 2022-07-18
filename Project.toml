@@ -3,6 +3,9 @@ uuid = "f8fcefdb-5f5a-475b-b2a0-c41c734946b5"
 authors = ["Sean <seanmcardle14@utexas.edu> and contributors"]
 version = "0.1.0"
 
+[deps]
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+
 [compat]
 julia = "1"
 
