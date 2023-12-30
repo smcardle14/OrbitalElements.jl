@@ -1,6 +1,18 @@
 module OrbitalElements
 
 using StaticArrays
+using LinearAlgebra
+
+"""
+    angle_vectors(a, b)
+
+Compute angle between two vectors with high precision.
+Credit to Alseidon for suggesting this as an alternative to using acos.
+"""
+function angle_vectors(a, b)
+    angle = atan(norm(cross(a, b)), dot(a, b))
+    return mod(angle, 2π)
+end
 
 """
     coe2rv(coe, μ=1)
@@ -59,12 +71,15 @@ See also [`coe2rv`](@ref)
 """
 function rv2coe(rv, μ=1)
 
+    xvec = @SVector([1,0,0])
+    zvec = @SVector([0,0,1])
+
     x, y, z, u, v, w = rv
 
     rvec = @SVector([x, y, z])
     vvec = @SVector([u, v, w])
     hvec = cross_local(rvec, vvec)
-    nvec = cross_local(@SVector([0,0,1]), hvec)
+    nvec = cross_local(zvec, hvec)
 
     r = sqrt(sum(rvec.^2))
     v = sqrt(sum(vvec.^2))
@@ -80,23 +95,21 @@ function rv2coe(rv, μ=1)
 
     if (abs(e - 1.0) > 1.0e-16)
         a = -0.5*μ/ξ
-        p = a*(1-e^2)
+        # p = a*(1-e^2)
     else
-        p = h^2/μ
+        # p = h^2/μ
         a = Inf
     end
 
-    i = acos(hvec[3]/h)
+    i = angle_vectors(hvec, zvec)
 
-    Ω = acos(nvec[1]/n)
+    Ω = angle_vectors(nvec, xvec)
     if nvec[2] < 0.0; Ω = 2.0*π - Ω; end
 
-    ndote = sum(nvec.*evec)
-    ω = acos(ndote/n/e)
+    ω = angle_vectors(evec, nvec)
     if evec[3] < 0.0; ω = 2.0*π - ω; end
 
-    edotr = sum(evec.*rvec)
-    ν = acos(edotr/e/r)
+    ν = angle_vectors(rvec, evec)
     if rdotv < 0.0; ν = 2.0*π - ν; end
 
     # Special cases
@@ -104,17 +117,16 @@ function rv2coe(rv, μ=1)
     equatorial = (abs(i) < 1.0e-16) || (abs(i-π) < 1.0e-16)
     if !circular && equatorial # ν is now true longitude of periapsis
         ω = 0.0
-        ν = acos(evec[1]/e)
+        ν = angle_vectors(rvec, evec)
         if evec[2]*cos(i) < 0.0; ν = 2.0*π - ν; end
     elseif circular && !equatorial # ν is now argument of latitude
         Ω = 0.0
-        ndotr = sum(nvec.*rvec)
-        ν = acos(ndotr/n/r)
+        ν = angle_vectors(rvec, nvec)
         if rvec[3] < 0.0; ν = 2.0*π - ν; end
     elseif circular && equatorial # ν is now true longitude
         ω = 0.0
         Ω = 0.0
-        ν = acos(rvec[1]/r)
+        ν = angle_vectors(rvec, xvec)
         if rvec[2]*cos(i) < 0.0; ν = 2.0*π - ν; end
     end
 
