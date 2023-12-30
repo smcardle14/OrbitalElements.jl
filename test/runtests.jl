@@ -29,11 +29,20 @@ rv = [6525.36812098609, 6861.531834896053, 6449.11861416016,
 
 
     # rv2coe
-    # Direct equatorial case (i=0)
+    # Circular, polar case (i=90)
+    @test isapprox(rv2coe([1.0, 0.0, 0.0, 0.0, 0.0, 1.0]), [1.0, 0.0, π/2, 0.0, 0.0, 0.0], rtol=1e-15)
+
+    # Direct circular, equatorial case (i=0)
     @test rv2coe([1.0, 0.0, 0.0, 0.0, 1.0, 0.0]) == [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
-    # Retrograde equatorial case (i=π)
+    # Direct eccentric, equatorial case (i=0)
+    @test isapprox(rv2coe([1.0, 0.0, 0.0, 0.0, 0.9, 0.0]), [0.8403361344537815, 0.19, 0.0, 0.0, 0.0, π], rtol=1e-15)
+
+    # Retrograde circular, equatorial case (i=π)
     @test isapprox(rv2coe([1.0, 0.0, 0.0, 0.0, -1.0, 0.0]), [1.0, 0.0, π, 0.0, 0.0, 0.0], rtol=1e-15)
+
+    # Retrograde eccentric, equatorial case (i=π)
+    @test isapprox(rv2coe([1.0, 0.0, 0.0, 0.0, -0.9, 0.0]), [0.8403361344537815, 0.19, π, 0.0, 0.0, π], rtol=1e-15)
 
     # Vallado test case
     @test isapprox(rv2coe(rv, μ), coe, rtol=1e-15*μ)
