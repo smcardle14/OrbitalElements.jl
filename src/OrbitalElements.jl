@@ -1,18 +1,7 @@
 module OrbitalElements
 
 using StaticArrays
-using LinearAlgebra
 
-"""
-    angle_vectors(a, b)
-
-Compute angle between two vectors with high precision.
-Credit to Alseidon for suggesting this as an alternative to using acos.
-"""
-function angle_vectors(a, b)
-    angle = atan(norm(cross(a, b)), dot(a, b))
-    return mod(angle, 2π)
-end
 
 """
     coe2rv(coe, μ=1)
@@ -56,6 +45,7 @@ function coe2rv(coe, μ=1)
     return rv
 end
 
+
 """
     rv2coe(rv, μ=1)
 
@@ -78,8 +68,8 @@ function rv2coe(rv, μ=1)
 
     rvec = @SVector([x, y, z])
     vvec = @SVector([u, v, w])
-    hvec = cross_local(rvec, vvec)
-    nvec = cross_local(zvec, hvec)
+    hvec = cross3(rvec, vvec)
+    nvec = cross3(zvec, hvec)
 
     r = sqrt(sum(rvec.^2))
     v = sqrt(sum(vvec.^2))
@@ -135,13 +125,24 @@ function rv2coe(rv, μ=1)
     return coe
 end
 
-function cross_local(a, b)
+
+"""
+    cross3(a, b)
+
+Compute cross product of 3-element vectors a and b.
+"""
+function cross3(a, b)
     return @SVector([a[2]*b[3]-a[3]*b[2], 
                      a[3]*b[1]-a[1]*b[3], 
                      a[1]*b[2]-a[2]*b[1]])
-
 end
 
+
+"""
+    rot1(θ)
+
+Compute matrix for rotation of θ about 1-axis.
+"""
 function rot1(θ)
     return @SMatrix(
     [1       0      0;
@@ -149,6 +150,12 @@ function rot1(θ)
      0 -sin(θ) cos(θ)])
 end
 
+
+"""
+    rot3(θ)
+
+Compute matrix for rotation of θ about 3-axis.
+"""
 function rot3(θ)
     return @SMatrix(
     [ cos(θ)  sin(θ)  0;
@@ -156,7 +163,21 @@ function rot3(θ)
           0       0   1])
 end
 
+
+"""
+    angle_vectors(a, b)
+
+Compute angle between two vectors with high precision.
+Credit to Alseidon for suggesting this as an alternative to using acos.
+"""
+function angle_vectors(a, b)
+    angle = atan(sqrt(sum(cross3(a, b).^2)), sum(a.*b))
+    return mod(angle, 2π)
+end
+
+
 export coe2rv
 export rv2coe
+
 
 end
