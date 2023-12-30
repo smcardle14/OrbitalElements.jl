@@ -14,14 +14,36 @@ rv = [6525.36812098609, 6861.531834896053, 6449.11861416016,
 
 @testset "OrbitalElements.jl" begin
 
+    # coe2rv
+    # Direct equatorial case (i=0)
     @test coe2rv([1.0, 0.0, 0.0, 0.0, 0.0, 0.0]) == [1.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+
+    # Retrograde equatorial case (i=π)
+    @test isapprox(coe2rv([1.0, 0.0, π, 0.0, 0.0, 0.0]), [1.0, 0.0, 0.0, 0.0, -1.0, 0.0], rtol=1e-15)
+
+    # Direct equatorial case (i=2π)
+    @test isapprox(coe2rv([1.0, 0.0, 2π, 0.0, 0.0, 0.0]), [1.0, 0.0, 0.0, 0.0, 1.0, 0.0], rtol=1e-15)
+
+    # Vallado test case
     @test isapprox(coe2rv(coe, μ), rv, rtol=1e-15*μ)
 
+
+    # rv2coe
+    # Direct equatorial case (i=0)
     @test rv2coe([1.0, 0.0, 0.0, 0.0, 1.0, 0.0]) == [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+    # Retrograde equatorial case (i=π)
+    @test isapprox(rv2coe([1.0, 0.0, 0.0, 0.0, -1.0, 0.0]), [1.0, 0.0, π, 0.0, 0.0, 0.0], rtol=1e-15)
+
+    # Vallado test case
     @test isapprox(rv2coe(rv, μ), coe, rtol=1e-15*μ)
 
+
+    # Benchmarking
     println("benchmarking coe2rv...")
     @btime coe2rv($coe, $μ)
+
     println("benchmarking rv2coe...")
     @btime rv2coe($rv, $μ)
+
 end
