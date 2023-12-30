@@ -19,7 +19,7 @@ function coe2rv(coe, μ=1)
 
     # Special cases
     circular = abs(e) < 1.0e-16
-    equatorial = abs(i) < 1.0e-16
+    equatorial = (abs(i) < 1.0e-16) || (abs(i-π) < 1.0e-16)
     if circular && equatorial
         ω = 0.0
         Ω = 0.0
@@ -101,11 +101,11 @@ function rv2coe(rv, μ=1)
 
     # Special cases
     circular = abs(e) < 1.0e-16
-    equatorial = abs(i) < 1.0e-16
+    equatorial = (abs(i) < 1.0e-16) || (abs(i-π) < 1.0e-16)
     if !circular && equatorial # ν is now true longitude of periapsis
         ω = 0.0
         ν = acos(evec[1]/e)
-        if evec[2] < 0.0; ν = 2.0*π - ν; end
+        if evec[2]*cos(i) < 0.0; ν = 2.0*π - ν; end
     elseif circular && !equatorial # ν is now argument of latitude
         Ω = 0.0
         ndotr = sum(nvec.*rvec)
@@ -115,7 +115,7 @@ function rv2coe(rv, μ=1)
         ω = 0.0
         Ω = 0.0
         ν = acos(r[1]/r)
-        if rvec[2] < 0; ν = 2.0*π - ν; end
+        if rvec[2]*cos(i) < 0.0; ν = 2.0*π - ν; end
     end
 
     coe = @SVector([a, e, i, ω, Ω, ν])
