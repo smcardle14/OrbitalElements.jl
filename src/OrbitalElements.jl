@@ -114,7 +114,7 @@ function rv2coe(rv, μ=1)
     elseif circular && equatorial # ν is now true longitude
         ω = 0.0
         Ω = 0.0
-        ν = acos(r[1]/r)
+        ν = acos(rvec[1]/r)
         if rvec[2]*cos(i) < 0.0; ν = 2.0*π - ν; end
     end
 
