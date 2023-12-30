@@ -1,7 +1,7 @@
 name = "OrbitalElements"
 uuid = "f8fcefdb-5f5a-475b-b2a0-c41c734946b5"
 authors = ["Sean <seanmcardle14@utexas.edu> and contributors"]
-version = "0.2.0"
+version = "0.3.0"
 
 [deps]
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
